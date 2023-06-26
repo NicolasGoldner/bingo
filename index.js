@@ -1,65 +1,128 @@
-function desenharCartela(){
-    const pai_div_cartela = document.getElementById('body_cartelas');
+var jogadores = [];
+var numeros_sorteados = [];
 
-    const div_cartela = document.createElement ('div');
+function desenharCartela(jogador) {
+  const pai_div_cartela = document.getElementById("body_cartelas");
 
-    div_cartela.className = 'cartela';
+  const div_cartela = document.createElement("div");
 
-    pai_div_cartela.appendChild(div_cartela);
+  div_cartela.className = "cartela";
 
-    const h4_jogador = document.createElement('h4');
+  pai_div_cartela.appendChild(div_cartela);
 
-    h4_jogador.innerText = "Nome Jogador";
+  const h4_jogador = document.createElement("h4");
 
-    div_cartela.appendChild(h4_jogador);
+  h4_jogador.innerText = jogador.nome;
 
-    const tabela = document.createElement('table');
-    const thead = document.createElement('thead');
-    const tbody = document.createElement('tbody');
+  div_cartela.appendChild(h4_jogador);
 
-    const thB = document.createElement('th');
-    const thI = document.createElement('th');
-    const thN = document.createElement('th');
-    const thG = document.createElement('th');
-    const thO = document.createElement('th');
+  const tabela = document.createElement("table");
+  const thead = document.createElement("thead");
+  const tbody = document.createElement("tbody");
 
-    thB.innerText = 'B'
-    thI.innerText = 'I'
-    thN.innerText = 'N'
-    thG.innerText = 'G'
-    thO.innerText = 'O'
+  const thB = document.createElement("th");
+  const thI = document.createElement("th");
+  const thN = document.createElement("th");
+  const thG = document.createElement("th");
+  const thO = document.createElement("th");
 
-    thead.appendChild(thB);
-    thead.appendChild(thI);
-    thead.appendChild(thN);
-    thead.appendChild(thG);
-    thead.appendChild(thO);
+  thB.innerText = "B";
+  thI.innerText = "I";
+  thN.innerText = "N";
+  thG.innerText = "G";
+  thO.innerText = "O";
 
-    for(var i = 0; i < 5; i++){
-        const tr = document.createElement('tr');
-        for(var j = 0; j < 5; j++){
-            const td = document.createElement('td');
-            td.innerText = 'X';
-            tr.appendChild(td);
-        }
-        tbody.appendChild(tr)
+  thead.appendChild(thB);
+  thead.appendChild(thI);
+  thead.appendChild(thN);
+  thead.appendChild(thG);
+  thead.appendChild(thO);
+
+  for (var i = 0; i < 5; i++) {
+    const tr = document.createElement("tr");
+    for (var j = 0; j < 5; j++) {
+      const td = document.createElement("td");
+      td.innerText = jogador.cartela[j][i];
+      tr.appendChild(td);
     }
+    tbody.appendChild(tr);
+  }
 
-    tabela.appendChild(thead);
-    tabela.appendChild(tbody);
+  tabela.appendChild(thead);
+  tabela.appendChild(tbody);
 
-    div_cartela.appendChild(tabela);
+  div_cartela.appendChild(tabela);
 }
 
-function gerarCartela(){
-    var cartela = [];
+function gerarColuna(quantidade, inicio, fim) {
+  var coluna = [];
 
-    while(cartela.length < 25){
-        var aleatorio = Math.floor(Math.random()*75 + 1);
-        if(!cartela.includes(aleatorio)){
-            cartela.push(aleatorio);
-        }
+  while (coluna.length < quantidade) {
+    var aleatorio = Math.floor(Math.random() * (fim - inicio) + inicio);
+    if (!coluna.includes(aleatorio)) {
+      coluna.push(aleatorio);
     }
-    
-    return cartela;    
+  }
+  return coluna;
+}
+
+function gerarCartela() {
+  var cartela = [
+    gerarColuna(5, 1, 15),
+    gerarColuna(5, 16, 30),
+    gerarColuna(5, 31, 45),
+    gerarColuna(5, 46, 60),
+    gerarColuna(5, 61, 75),
+  ];
+
+  return cartela;
+}
+
+function inscreverJogador() {
+  const nome = prompt("Digite o nome do jogador:");
+
+  if (nome.length < 4) {
+    alert("Nome precisa ter mais que 4 caracteres");
+    return;
+  }
+  const cartela = gerarCartela();
+  const jogador = {
+    nome: nome,
+    cartela: cartela,
+  };
+  jogadores.push(jogador);
+  desenharCartela(jogador);
+}
+function jogar() {
+  if (jogadores.length < 2) {
+    alert("É preciso haver no minimo 2 jogadores");
+    return;
+  }
+  const intervalo = setInterval(function () {
+    while (true) {
+      var aleatorio = Math.floor(Math.random() * 75 + 1);
+      if (!numeros_sorteados.includes(aleatorio)) {
+        numeros_sorteados.push(aleatorio);
+        break;
+      }
+    }
+
+    const body_numeros = document.getElementById("body_numeros");
+    const span = document.createElement("span");
+    span.innerText = aleatorio;
+
+    conferirJogo(aleatorio);
+
+    body_numeros.appendChild(span);
+  }, 500);
+}
+
+function conferirJogo(sorteado) {
+  var numeros_cartelas = document.getElementsByTagName("td");
+
+  for (var i = 0; i < numeros_cartelas.length; i++) {
+    if (numeros_cartelas[i].innerText == sorteado) {
+      numeros_cartelas[i].style.backgroundColor = "green";
+    }
+  }
 }
